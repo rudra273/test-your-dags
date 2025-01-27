@@ -20,7 +20,7 @@ with DAG(
         release_label='emr-6.5.0-latest',  # EMR release version
         job_driver={
             'sparkSubmitJobDriver': {
-                'entryPoint': 's3://<your-bucket>/path/to/your/spark-job.py',  # Replace with your Spark job S3 path
+                'entryPoint': 's3://emr-bucket-cluster/hello_world.py',  # Replace with your Spark job S3 path
                 'sparkSubmitParameters': '--conf spark.executor.instances=2 --conf spark.executor.memory=2G --conf spark.driver.memory=2G --conf spark.executor.cores=2'
             }
         },
