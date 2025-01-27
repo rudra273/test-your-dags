@@ -41,7 +41,6 @@ with DAG(
             }
         },
         name='airflow-spark-job',
-        region='us-west-2'
     )
 
     submit_spark_job
