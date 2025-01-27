@@ -41,6 +41,8 @@ with DAG(
             }
         },
         name='airflow-spark-job',
+        aws_conn_id='aws_default', 
+        region_name='us-east-1', 
     )
 
     submit_spark_job
