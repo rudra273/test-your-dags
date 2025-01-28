@@ -28,11 +28,22 @@ with DAG(
 
     # Function to create EMR virtual cluster
 
-    def create_emr_virtual_cluster(**kwargs):
-        # Use the Airflow AWS connection
+    def create_cluster(**kwargs):
+        # Create the AWS hook
         aws_hook = AwsBaseHook(aws_conn_id='aws_default', client_type='emr-containers')
-        # client = aws_hook.get_client()
-        client = aws_hook.get_client_type('emr-containers')
+        
+        # Get credentials
+        credentials = aws_hook.get_credentials()
+        
+        # Create the client with explicit region
+        client = boto3.client(
+            'emr-containers',
+            region_name='us-east-2',  # Replace with your AWS region
+            aws_access_key_id=credentials.access_key,
+            aws_secret_access_key=credentials.secret_key,
+            # aws_session_token=credentials.token  # Include if you're using temporary credentials
+        )
+        
         try:
             response = client.create_virtual_cluster(
                 name='dco-emr-dev',
@@ -51,27 +62,32 @@ with DAG(
             print(f"Successfully created EMR virtual cluster: {virtual_cluster_id}")
             return virtual_cluster_id
         except ClientError as e:
-            error_message = f"Failed to create EMR virtual cluster: {e.response['Error']['Message']}"
+            error_message = f"Failed to create EMR virtual cluster: {str(e)}"
             print(error_message)
             raise AirflowException(error_message)
-
+    
     # Function to terminate EMR virtual cluster
-    def terminate_emr_virtual_cluster(**kwargs):
+    def terminate_cluster(**kwargs):
         ti = kwargs['ti']
         virtual_cluster_id = ti.xcom_pull(task_ids='create_emr_virtual_cluster', key='virtual_cluster_id')
-        client = boto3.client('emr-containers')
+        
+        # Use the same AWS connection method
+        aws_hook = AwsBaseHook(aws_conn_id='aws_default', client_type='emr-containers')
+        credentials = aws_hook.get_credentials()
+        
+        client = boto3.client(
+            'emr-containers',
+            region_name='us-east-1',  # Replace with your AWS region
+            aws_access_key_id=credentials.access_key,
+            aws_secret_access_key=credentials.secret_key,
+            aws_session_token=credentials.token  # Include if you're using temporary credentials
+        )
+        
         try:
             client.delete_virtual_cluster(id=virtual_cluster_id)
             print(f"Terminated EMR virtual cluster: {virtual_cluster_id}")
         except ClientError as e:
-            raise AirflowException(f"Failed to terminate EMR virtual cluster: {e}")
-
-    # Task to create EMR virtual cluster
-    create_cluster = PythonOperator(
-        task_id='create_emr_virtual_cluster',
-        python_callable=create_emr_virtual_cluster,
-        provide_context=True,
-    )
+            raise AirflowException(f"Failed to terminate EMR virtual cluster: {str(e)}")
 
     # Task to submit Spark job
     submit_spark_job = EmrContainerOperator(
