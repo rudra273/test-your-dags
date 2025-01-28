@@ -42,9 +42,12 @@ with DAG(
             )
             virtual_cluster_id = response['id']
             kwargs['ti'].xcom_push(key='virtual_cluster_id', value=virtual_cluster_id)
+            print(f"Successfully created EMR virtual cluster: {virtual_cluster_id}")
             return virtual_cluster_id
         except ClientError as e:
-            raise AirflowException(f"Failed to create EMR virtual cluster: {e}")
+            error_message = f"Failed to create EMR virtual cluster: {e.response['Error']['Message']}"
+            print(error_message)
+            raise AirflowException(error_message)
 
     # Function to terminate EMR virtual cluster
     def terminate_emr_virtual_cluster(**kwargs):
