@@ -33,12 +33,12 @@ with DAG(
                     }
                 }
             ],
-            'monitoringConfiguration': {
-                'cloudWatchMonitoringConfiguration': {
-                    'logGroupName': '/emr-on-eks-logs',
-                    'logStreamNamePrefix': 'airflow'
-                }
-            }
+            # 'monitoringConfiguration': {
+            #     'cloudWatchMonitoringConfiguration': {
+            #         'logGroupName': '/emr-on-eks-logs',
+            #         'logStreamNamePrefix': 'airflow'
+            #     }
+            # }
         },
         name='airflow-spark-job',
     )
