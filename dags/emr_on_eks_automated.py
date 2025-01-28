@@ -26,7 +26,8 @@ with DAG(
 
     # Function to create EMR virtual cluster
     def create_emr_virtual_cluster(**kwargs):
-        client = boto3.client('emr-containers')
+        # Specify the AWS region explicitly
+        client = boto3.client('emr-containers', region_name='us-east-2')  # Replace with your desired region
         try:
             response = client.create_virtual_cluster(
                 name='dco-emr-dev',
