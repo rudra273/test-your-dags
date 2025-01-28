@@ -16,7 +16,7 @@ with DAG(
     submit_spark_job = EmrContainerOperator(
         task_id='submit_spark_job',
         virtual_cluster_id='3661txnkugj15sb9h3lz56ir1',  # Replace with your EMR virtual cluster ID
-        execution_role_arn='arn:aws:iam::343218188894:role/aws-service-role/emr-containers.amazonaws.com/AWSServiceRoleForAmazonEMRContainers',  # Replace with your IAM role ARN
+        execution_role_arn='arn:aws:iam::343218188894:role/emr-job-role',  # Replace with your IAM role ARN
         release_label='emr-6.5.0-latest',  # EMR release version
         job_driver={
             'sparkSubmitJobDriver': {
