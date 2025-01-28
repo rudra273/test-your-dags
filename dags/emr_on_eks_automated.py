@@ -31,7 +31,8 @@ with DAG(
     def create_emr_virtual_cluster(**kwargs):
         # Use the Airflow AWS connection
         aws_hook = AwsBaseHook(aws_conn_id='aws_default', client_type='emr-containers')
-        client = aws_hook.get_client()
+        # client = aws_hook.get_client()
+        client = aws_hook.get_client_type('emr-containers')
         try:
             response = client.create_virtual_cluster(
                 name='dco-emr-dev',
