@@ -8,6 +8,8 @@ from botocore.exceptions import ClientError
 from airflow.exceptions import AirflowException
 from airflow.operators.python_operator import PythonOperator
 from datetime import timedelta
+from airflow.providers.amazon.aws.hooks.base_aws import AwsBaseHook
+
 
 # Define default arguments
 default_args = {
@@ -22,12 +24,14 @@ with DAG(
     dag_id='emr_on_eks_automated',
     default_args=default_args,
     schedule_interval=None,
-) as dag:
+) as dag: 
 
     # Function to create EMR virtual cluster
+
     def create_emr_virtual_cluster(**kwargs):
-        # Specify the AWS region explicitly
-        client = boto3.client('emr-containers', region_name='us-east-2')  # Replace with your desired region
+        # Use the Airflow AWS connection
+        aws_hook = AwsBaseHook(aws_conn_id='aws_default', client_type='emr-containers')
+        client = aws_hook.get_client()
         try:
             response = client.create_virtual_cluster(
                 name='dco-emr-dev',
